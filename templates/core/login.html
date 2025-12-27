@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="flex justify-center items-center min-h-[70vh]">
+        <div class="w-full max-w-sm bg-white shadow-lg rounded-lg p-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Zaloguj się</h2>
+
+            {% if form.errors %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                    <p>Błędny login lub hasło.</p>
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="id_username">Login</label>
+                    <input type="text" name="username" autofocus required id="id_username"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="id_password">Hasło</label>
+                    <input type="password" name="password" required id="id_password"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 mt-4">
+                    Zaloguj się
+                </button>
+
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+
+            <p class="text-center text-gray-500 text-xs mt-6">
+                Nie masz konta? <a href="{% url 'register' %}" class="text-blue-500 hover:text-blue-800 font-bold">Zarejestruj się</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="mb-4">
+                    {% if user.profile.photo %}
+                        <img src="{{ user.profile.photo.url }}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-blue-100">
+                    {% else %}
+                        <div class="w-32 h-32 rounded-full mx-auto bg-gray-300 flex items-center justify-center text-gray-500">
+                            Brak foto
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h2 class="text-xl font-bold text-gray-800">{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="text-gray-500 text-sm mb-4">@{{ user.username }}</p>
+                <p class="text-gray-400 text-xs">Dołączył: {{ user.date_joined|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Twój Karnet</h3>
+
+                {% if active_membership %}
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-green-700 text-lg">{{ active_membership.membership_type.name }}</p>
+                                <p class="text-sm text-green-600">Ważny do: {{ active_membership.expiration_date|date:"d.m.Y" }}</p>
+                            </div>
+                            <span class="bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">AKTYWNY</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                        <p class="text-yellow-700">Nie posiadasz aktywnego karnetu.</p>
+                    </div>
+
+                    <div class="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <p class="text-gray-600 mb-4">Aby zapisywać się na zajęcia, musisz posiadać aktywny karnet.</p>
+                        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">
+                            Kup Karnet
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

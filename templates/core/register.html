@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="flex justify-center items-center min-h-[80vh]">
+        <div class="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Dołącz do GymManager</h2>
+
+            {% if form.errors or profile_form.errors %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <p>Popraw błędy w formularzu.</p>
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        <input type="{{ field.field.widget.input_type }}"
+                               name="{{ field.name }}"
+                               id="{{ field.id_for_label }}"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                               {% if field.value %}value="{{ field.value }}"{% endif %}>
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs italic">{{ field.errors.0 }}</p>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="text-gray-500 text-xs">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="pt-4 border-t">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ profile_form.photo.label }}
+                    </label>
+                    {{ profile_form.photo }}
+                    {% if profile_form.photo.errors %}
+                        <p class="text-red-500 text-xs italic">{{ profile_form.photo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                    Zarejestruj się
+                </button>
+            </form>
+
+            <p class="text-center text-gray-500 text-xs mt-4">
+                Masz już konto? <a href="/admin/" class="text-blue-500 hover:text-blue-800">Zaloguj się</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}
