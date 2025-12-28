@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import secrets
+from .validators import validate_pesel
 
 # Rodzaje karnetu (nazwa, cena, czas trwania)
 class MembershipType(models.Model):
@@ -72,6 +74,27 @@ class Enrollments(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     photo = models.ImageField(upload_to='profile_photos/', verbose_name="Zdjęcie profilowe")
+
+    pesel = models.CharField(
+        max_length=11,
+        unique=True,
+        validators=[validate_pesel],
+        verbose_name="PESEL",
+        null=False,
+        blank=True
+    )
+
+    card_number = models.CharField(
+        max_length=64,
+        unique=True,
+        blank=True,
+        verbose_name="Numer karty"
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.card_number:
+            self.card_number = secrets.token_hex(32)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Profil: {self.user.username}"

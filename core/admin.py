@@ -35,4 +35,6 @@ class EnrollmentAdmin(admin.ModelAdmin):
 # Rejestracja Profilu (zdjęcie)
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'photo')
+    list_display = ('user', 'pesel', 'photo')
+    readonly_fields = ('card_number',)
+    search_fields = ('user__username', 'pesel', 'card_number')
