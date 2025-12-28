@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Dodaj nowe zajęcia</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="flex items-center justify-between mt-6">
+                <a href="{% url 'class_schedule' %}" class="text-gray-500 hover:text-gray-800 text-sm font-bold">Anuluj</a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Dodaj do grafiku
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

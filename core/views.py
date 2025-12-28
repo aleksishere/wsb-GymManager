@@ -1,13 +1,14 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib import messages
 from django.utils import timezone
 
-from .forms import SignUpForm, ProfileForm
-from .models import UserMembership, MembershipType, Visit
+from .forms import SignUpForm, ProfileForm, ClassSessionForm
+from .models import UserMembership, MembershipType, Visit, ClassSessions, Enrollments
 
 
 def home(request):
@@ -78,10 +79,17 @@ def reception_panel(request):
         if last_visit and last_visit.exit_time is None:
             in_gym = True
             visit_id = last_visit.id
+
+        active_membership = user.memberships.filter(
+            is_active=True,
+            expiration_date__gte=timezone.now().date()
+        ).select_related('membership_type').first()
+
         users_with_status.append({
             'user': user,
             'in_gym': in_gym,
-            'visit_id': visit_id
+            'visit_id': visit_id,
+            'active_membership': active_membership
         })
     return render(request, 'core/reception_panel.html', {'users_with_status': users_with_status})
 
@@ -106,3 +114,34 @@ def toggle_visit(request, user_id):
         else:
             messages.error(request, f"Użytkownik {user.username} nie ma aktywnego karnetu.")
     return redirect('reception_panel')
+@login_required()
+def class_schedule(request):
+    upcoming_classes = ClassSessions.objects.all().order_by('date')
+    user_enrollments = Enrollments.objects.filter(user=request.user).values_list('class_session_id', flat=True)
+    return render(request, 'core/class_schedule.html', {
+        'upcoming_classes': upcoming_classes,
+        'user_enrollments': user_enrollments
+    })
+@staff_member_required()
+def create_class(request):
+    if request.method == 'POST':
+        form = ClassSessionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Zajęcia zostały dodane.')
+            return redirect('class_schedule')
+    else:
+        form = ClassSessionForm()
+
+    return render(request, 'core/create_class.html', {'form': form})
+@login_required
+def signup_for_class(request, class_id):
+    class_session = get_object_or_404(ClassSessions, id=class_id)
+    try:
+        Enrollments.objects.create(user=request.user, class_session=class_session)
+        messages.success(request, 'Zapisano się na zajęcia.')
+    except ValidationError as e:
+        messages.error(request, str(e))
+    except Exception as e:
+        messages.error(request, str(e))
+    return redirect('class_schedule')

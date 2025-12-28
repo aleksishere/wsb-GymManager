@@ -39,16 +39,24 @@ class UserMembership(models.Model):
 # Zajęcia użytkownika
 class ClassSessions(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa zajęć")
-    date = models.DateField(verbose_name="Data zajęć")
+    date = models.DateTimeField(verbose_name="Data zajęć")
     capacity = models.PositiveIntegerField(verbose_name="Limit miejsc")
-    uczestnicy = models.ManyToManyField(User, through='Enrollments', related_name='classes')
+    participants = models.ManyToManyField(User, through='Enrollments', related_name='classes')
 
     def clean(self):
-        if self.date < timezone.now().date():
+        if self.date and self.date < timezone.now():
             raise ValidationError("Data zajęć nie może być wcześniejsza niż obecna data.")
 
     def __str__(self):
         return f"{self.name} - {self.date.strftime('%Y-%m-%d %H:%M')}"
+
+    @property
+    def spot_count(self):
+        return self.participants.count()
+
+    @property
+    def is_full(self):
+        return self.spot_count >= self.capacity
 
 # Zapisy
 class Enrollments(models.Model):
@@ -58,6 +66,9 @@ class Enrollments(models.Model):
 
     class Meta:
         unique_together = ('user', 'class_session')
+        verbose_name = "Zapis"
+        verbose_name_plural = "Zapisy"
+
     def clean(self):
         current_count = self.class_session.participants.count()
         if current_count >= self.class_session.capacity:

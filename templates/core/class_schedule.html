@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Grafik Zajęć</h2>
+
+            {% if user.is_staff %}
+                <a href="{% url 'create_class' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition">
+                    + Dodaj Zajęcia
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="grid gap-6">
+            {% for item in upcoming_classes %}
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row justify-between items-center border-l-4 border-blue-500">
+
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold text-gray-800">{{ item.name }}</h3>
+                        <p class="text-blue-600 font-medium">{{ item.date|date:"l, d.m.Y" }} | godz. {{ item.date|date:"H:i" }}</p>
+
+                        <div class="mt-2 text-sm text-gray-600 flex items-center gap-4">
+                    <span>👥 Miejsca:
+                        <span class="font-bold {% if item.is_full %}text-red-500{% else %}text-green-600{% endif %}">
+                            {{ item.spot_count }} / {{ item.capacity }}
+                        </span>
+                    </span>
+                            {% if item.is_full %}
+                                <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-bold">KOMPLET</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        {% if item.id in user_enrollments %}
+                            <button disabled class="bg-gray-300 text-gray-500 font-bold py-2 px-6 rounded cursor-not-allowed">
+                                Już zapisany
+                            </button>
+                        {% else %}
+                            {% if item.is_full %}
+                                <button disabled class="bg-gray-100 text-gray-400 font-bold py-2 px-6 rounded border cursor-not-allowed">
+                                    Brak miejsc
+                                </button>
+                            {% else %}
+                                <a href="{% url 'signup_for_class' item.id %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded shadow transition transform hover:scale-105">
+                                    Zapisz się
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-12 bg-gray-50 rounded-lg">
+                    <p class="text-gray-500 text-lg">Brak zaplanowanych zajęć na najbliższy czas.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

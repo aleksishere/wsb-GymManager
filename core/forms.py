@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile
+from .models import Profile, ClassSessions
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True, label="Imię")
@@ -23,3 +24,26 @@ class ProfileForm(forms.ModelForm):
             'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500',
             'placeholder': 'Podaj 11-cyfrowy PESEL'
         })
+
+# core/forms.py
+
+class ClassSessionForm(forms.ModelForm):
+    date = forms.DateTimeField(
+        label="Data i godzina",
+        input_formats=['%Y-%m-%dT%H:%M'],
+        widget=forms.DateTimeInput(
+            attrs={
+                'type': 'datetime-local',
+                'class': 'shadow border rounded w-full py-2 px-3'
+            },
+            format='%Y-%m-%dT%H:%M'
+        )
+    )
+
+    class Meta:
+        model = ClassSessions
+        fields = ['name', 'date', 'capacity']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'shadow border rounded w-full py-2 px-3'}),
+            'capacity': forms.NumberInput(attrs={'class': 'shadow border rounded w-full py-2 px-3'}),
+        }
