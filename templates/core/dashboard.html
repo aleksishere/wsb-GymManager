@@ -54,13 +54,52 @@
 
                     <div class="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                         <p class="text-gray-600 mb-4">Aby zapisywać się na zajęcia, musisz posiadać aktywny karnet.</p>
-                        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">
+                        <a href="{% url 'membership_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">
                             Kup Karnet
                         </a>
                     </div>
                 {% endif %}
             </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Ostatnie wejścia</h3>
 
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2">Wejście</th>
+                            <th class="px-4 py-2">Wyjście</th>
+                            <th class="px-4 py-2">Czas</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for visit in recent_visits %}
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-4 py-3">{{ visit.entry_time|date:"d.m.Y H:i" }}</td>
+                                <td class="px-4 py-3">
+                                    {% if visit.exit_time %}
+                                        {{ visit.exit_time|date:"H:i" }}
+                                    {% else %}
+                                        <span class="text-green-600 font-bold">W trakcie...</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {% if visit.exit_time %}
+                                        {{ visit.exit_time|timeuntil:visit.entry_time }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-center">Brak historii wejść.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

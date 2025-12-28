@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -12,6 +14,7 @@ class MembershipType(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa karnetu")
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Cena")
     duration_days = models.PositiveIntegerField(verbose_name="Długość (dni)")
+    description = models.TextField(verbose_name="Opis korzyści", default="", blank=True)
     def __str__(self):
         return self.name
 
@@ -22,6 +25,7 @@ class UserMembership(models.Model):
     purchase_date = models.DateField(default=timezone.now)
     expiration_date = models.DateField()
     is_active = models.BooleanField(default=True)
+
 
     def clean(self):
         if self.expiration_date <= self.purchase_date:
@@ -80,7 +84,7 @@ class Profile(models.Model):
         unique=True,
         validators=[validate_pesel],
         verbose_name="PESEL",
-        null=False,
+        null=True,
         blank=True
     )
 
@@ -98,6 +102,25 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"Profil: {self.user.username}"
+
+class Visit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='visits')
+    entry_time = models.DateTimeField(auto_now_add=True, verbose_name="Czas wyjścia")
+    exit_time = models.DateTimeField(null=True, blank=True, verbose_name="Czas wejścia")
+
+    def save(self, *args, **kwargs):
+        cutoff_time = timezone.now() - timedelta(hours=24)
+        old_visits = Visit.objects.filter(exit_time__isnull=True, entry_time__lt=cutoff_time)
+        for v in old_visits:
+            v.exit_time = v.entry_time + timedelta(hours=24)
+            v.save()
+        super().save(*args, **kwargs)
+    @property
+    def is_active(self):
+        return self.exit_time is None
+
+    def __str__(self):
+        return f"Wizyta: {self.user.username} ({self.entry_time.strftime('%Y-%m-%d %H:%M')})"
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

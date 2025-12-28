@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Wybierz swój karnet</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for membership in memberships %}
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 transform hover:-translate-y-1 border border-gray-100">
+                    <div class="bg-blue-600 p-4 text-center">
+                        <h3 class="text-xl font-bold text-white">{{ membership.name }}</h3>
+                    </div>
+
+                    <div class="p-6 text-center">
+                        <p class="text-4xl font-bold text-gray-800 mb-2">{{ membership.price }} <span class="text-lg text-gray-500 font-normal">PLN</span></p>
+                        <p class="text-gray-500 mb-6">Ważny przez <span class="font-bold">{{ membership.duration_days }}</span> dni</p>
+
+                        <ul class="text-sm text-gray-600 mb-6 space-y-2">
+                            {{ membership.description|linebreaks }}
+                        </ul>
+
+                        <form action="{% url 'purchase_membership' membership.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-200">
+                                Wybierz
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-3 text-center py-10">
+                    <p class="text-gray-500 text-lg">Brak dostępnych karnetów w ofercie.</p>
+                    <p class="text-sm text-gray-400">(Dodaj je w panelu administratora)</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="{% url 'dashboard' %}" class="text-gray-500 hover:text-gray-800 underline">Wróć do Dashboardu</a>
+        </div>
+    </div>
+{% endblock %}
