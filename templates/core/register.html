@@ -33,6 +33,16 @@
                     </div>
                 {% endfor %}
 
+                <div class="mt-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ profile_form.pesel.id_for_label }}">
+                        {{ profile_form.pesel.label }}
+                    </label>
+                    {{ profile_form.pesel }}
+                    {% if profile_form.pesel.errors %}
+                        <p class="text-red-500 text-xs italic">{{ profile_form.pesel.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
                 <div class="pt-4 border-t">
                     <label class="block text-gray-700 text-sm font-bold mb-2">
                         {{ profile_form.photo.label }}

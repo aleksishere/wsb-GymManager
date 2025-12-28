@@ -8,7 +8,7 @@ def validate_pesel(value):
 
     weights = [1,3,7,9,1,3,7,9,1,3]
 
-    pesel_digits = [int(digit()) for digit in value]
+    pesel_digits = [int(digit) for digit in value]
     checksum = sum(digit * weight for digit, weight in zip(pesel_digits[:10], weights))
     last_digit = checksum % 10
     control_digit = 10 - last_digit if last_digit != 0 else 0
