@@ -31,22 +31,31 @@
                             {% endif %}
                         </div>
                     </div>
-
-                    <div>
-                        {% if item.id in user_enrollments %}
-                            <button disabled class="bg-gray-300 text-gray-500 font-bold py-2 px-6 rounded cursor-not-allowed">
-                                Już zapisany
-                            </button>
-                        {% else %}
-                            {% if item.is_full %}
-                                <button disabled class="bg-gray-100 text-gray-400 font-bold py-2 px-6 rounded border cursor-not-allowed">
-                                    Brak miejsc
+                    <div class="flex gap-4">
+                        <div>
+                            {% if item.id in user_enrollments %}
+                                <button disabled class="bg-gray-300 text-gray-500 font-bold py-2 px-6 rounded cursor-not-allowed">
+                                    Już zapisany
                                 </button>
                             {% else %}
-                                <a href="{% url 'signup_for_class' item.id %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded shadow transition transform hover:scale-105">
-                                    Zapisz się
-                                </a>
+                                {% if item.is_full %}
+                                    <button disabled class="bg-gray-100 text-gray-400 font-bold py-2 px-6 rounded border cursor-not-allowed">
+                                        Brak miejsc
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'signup_for_class' item.id %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded shadow transition transform hover:scale-105">
+                                        Zapisz się
+                                    </a>
+                                {% endif %}
                             {% endif %}
+                        </div>
+                        {% if user.is_staff %}
+                            <form action="{% url 'delete_class' item.id %}" method="post" onsubmit="return confirm('Czy na pewno chcesz usunąć te zajęcia? Tej operacji nie można cofnąć.');">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow transition" title="Usuń zajęcia">
+                                    Usuń
+                                </button>
+                            </form>
                         {% endif %}
                     </div>
                 </div>

@@ -16,6 +16,7 @@
                     <a class="text-gray-600 mr-5 font-semibold" href="{% url 'reception_panel' %}">Panel recepcji</a>
                 {% endif %}
                 {% if user.is_authenticated %}
+                    <a class="text-gray-600 mr-5 font-semibold" href="{% url 'class_schedule' %}">Zajęcia</a>
                     <a href="{% url 'dashboard' %}" class="mr-4 text-gray-600 hover:text-blue-600 font-semibold flex items-center gap-2">
                         {% if user.profile.photo %}
                             <img src="{{ user.profile.photo.url }}" class="w-8 h-8 rounded-full object-cover border border-gray-200">

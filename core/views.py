@@ -134,6 +134,18 @@ def create_class(request):
         form = ClassSessionForm()
 
     return render(request, 'core/create_class.html', {'form': form})
+
+@staff_member_required
+def delete_class(request, class_id):
+    if request.method == 'POST':
+        class_session = get_object_or_404(ClassSessions, id=class_id)
+        class_name = class_session.name
+        class_session.delete()
+        messages.success(request, f'Zajęcia "{class_name}" zostały usunięte.')
+        return redirect('class_schedule')
+    return redirect('class_schedule')
+
+
 @login_required
 def signup_for_class(request, class_id):
     class_session = get_object_or_404(ClassSessions, id=class_id)
