@@ -1,4 +1,3 @@
-import barcode
 import qrcode
 from io import BytesIO
 import base64

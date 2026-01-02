@@ -18,11 +18,10 @@ from .models import UserMembership, MembershipType, Visit, ClassSessions, Enroll
 def home(request):
     return render(request, 'base.html')
 
-
 def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
-        profile_form = ProfileForm(request.POST, request.FILES)  # request.FILES jest kluczowe dla zdjęć!
+        profile_form = ProfileForm(request.POST, request.FILES)
 
         if form.is_valid() and profile_form.is_valid():
             user = form.save()

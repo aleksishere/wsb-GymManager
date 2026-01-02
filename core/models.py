@@ -9,7 +9,7 @@ from django.dispatch import receiver
 import secrets
 from .validators import validate_pesel
 
-# Rodzaje karnetu (nazwa, cena, czas trwania)
+# Rodzaje karnetu (nazwa, cena, czas trwania, ilość wejść)
 class MembershipType(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa karnetu")
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Cena")
@@ -90,9 +90,9 @@ class Enrollments(models.Model):
         if not active_membership:
             raise ValidationError("Użytkownik nie ma aktywnego karnetu.")
 
-        def save(self, *args, **kwargs):
-            self.clean()
-            super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
