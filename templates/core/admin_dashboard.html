@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto px-4 py-8">
+
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Panel Zarządzania</h2>
+                <p class="text-gray-500">Statystyki za okres: {{ current_date|date:"F Y" }}</p>
+            </div>
+            <a href="{% url 'class_schedule' %}" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded shadow">
+                Zarządzaj Grafikiem
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <div class="text-gray-500 text-sm uppercase font-bold mb-1">Przychód (Ten miesiąc)</div>
+                <div class="text-3xl font-bold text-green-600">{{ monthly_revenue }} PLN</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <div class="text-gray-500 text-sm uppercase font-bold mb-1">Aktywni Klubowicze</div>
+                <div class="text-3xl font-bold text-blue-600">{{ active_members|length }}</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                <div class="text-gray-500 text-sm uppercase font-bold mb-1">Top Zajęcia</div>
+                <div class="text-xl font-bold text-purple-600">
+                    {% if popular_classes %}
+                        {{ popular_classes.0.name }} ({{ popular_classes.0.count }})
+                    {% else %}
+                        Brak danych
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h3 class="font-bold text-gray-700">🏆 Ranking Popularności Zajęć</h3>
+                </div>
+                <table class="min-w-full">
+                    <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Nazwa Zajęć</th>
+                        <th class="px-6 py-3 text-center">Liczba zapisów (łącznie)</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    {% for class_type in popular_classes %}
+                        <tr>
+                            <td class="px-6 py-4 font-medium">{{ class_type.name }}</td>
+                            <td class="px-6 py-4 text-center">
+                            <span class="bg-purple-100 text-purple-800 py-1 px-3 rounded-full text-xs font-bold">
+                                {{ class_type.count }} os.
+                            </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">Brak danych</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-700">👥 Aktywni Członkowie</h3>
+                    <span class="text-xs text-gray-500">Tylko z ważnym karnetem</span>
+                </div>
+                <div class="max-h-80 overflow-y-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100 text-gray-600 text-xs uppercase sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left">Użytkownik</th>
+                            <th class="px-6 py-3 text-left">PESEL</th>
+                            <th class="px-6 py-3 text-left">Karnet wygasa</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                        {% for member in active_members %}
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 text-xs font-bold text-gray-600">
+                                            {{ member.first_name|first }}{{ member.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-sm">{{ member.first_name }} {{ member.last_name }}</div>
+                                            <div class="text-xs text-gray-500">@{{ member.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-mono text-gray-600">
+                                    {{ member.profile.pesel|default:"-" }}
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    {% if member.active_membership %}
+                                        <div class="flex flex-col">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 w-fit">
+                                        {{ member.active_membership.membership_type.name }}
+                                    </span>
+                                            <span class="text-xs text-gray-400 mt-1">
+                                        ważny do: <span class="text-gray-600 font-medium">{{ member.active_membership.expiration_date|date:"d.m.Y" }}</span>
+                                    </span>
+                                        </div>
+                                    {% else %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Brak / Wygasł
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">Brak aktywnych członków</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+            <h3 class="font-bold text-gray-700">💰 Historia Dochodów (Ostatnie 12 miesięcy)</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
+                <tr>
+                    <th class="px-6 py-3 text-left">Miesiąc</th>
+                    <th class="px-6 py-3 text-right">Przychód</th>
+                    <th class="px-6 py-3 text-center">Status</th> </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                {% for item in historical_revenue %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900">
+                            {{ item.month|date:"F Y" }} </td>
+                        <td class="px-6 py-4 text-right font-bold text-green-600">
+                            {{ item.total|default:"0" }} PLN
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width: 50%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">Brak danych historycznych.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

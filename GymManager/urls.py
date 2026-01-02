@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from core.views import home, register, dashboard, membership_list, purchase_membership, reception_panel, toggle_visit, \
-    class_schedule, create_class, signup_for_class, delete_class
+    class_schedule, create_class, signup_for_class, delete_class, signout_from_class, admin_dashboard
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -38,6 +38,8 @@ urlpatterns = [
     path('schedule/add/', create_class, name='create_class'),
     path('schedule/delete/<int:class_id>/', delete_class, name='delete_class'),
     path('schedule/signup/<int:class_id>/', signup_for_class, name='signup_for_class'),
+    path('schedule/signout/<int:class_id>/', signout_from_class, name='signout_from_class'),
+    path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
     path("__reload__/", include("django_browser_reload.urls")),
 ]
 

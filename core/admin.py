@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import MembershipType, UserMembership, ClassSessions, Enrollments, Profile
+from .models import MembershipType, UserMembership, ClassSessions, Enrollments, Profile, Visit
+
 
 # Rejestracja Typu Karnetu
 @admin.register(MembershipType)
@@ -38,3 +39,10 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'pesel', 'photo')
     readonly_fields = ('card_number',)
     search_fields = ('user__username', 'pesel', 'card_number')
+
+@admin.register(Visit)
+class VisitAdmin(admin.ModelAdmin):
+    list_display = ['user', 'entry_time', 'exit_time']
+    list_filter = ['entry_time', 'exit_time']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name']
+    ordering = ['-entry_time']

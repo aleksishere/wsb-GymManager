@@ -15,8 +15,16 @@ class MembershipType(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Cena")
     duration_days = models.PositiveIntegerField(verbose_name="Długość (dni)")
     description = models.TextField(verbose_name="Opis korzyści", default="", blank=True)
+
+    entries_per_week = models.PositiveIntegerField(
+        verbose_name="Limit wejść w tygodniu",
+        null=True,
+        blank=True,
+        help_text="Zostaw puste dla karnetu bez limitu (Open)"
+    )
     def __str__(self):
-        return self.name
+        limit_str = f"{self.entries_per_week} wejść/tydzień" if self.entries_per_week else "OPEN"
+        return f"{self.name} ({limit_str})"
 
 # Karnet użytkownika
 class UserMembership(models.Model):
